@@ -2,6 +2,13 @@ import React from "react";
 import logo from "./assets/Logo.png";
 import google from "./assets/google.png";
 import background from "./assets/Image.png";
+import WebFont from "webfontloader";
+
+WebFont.load({
+  google: {
+    families: ["Bebas Neue", "Urbanist", "Cabin"],
+  },
+});
 
 const App = () => {
   return (
@@ -12,13 +19,15 @@ const App = () => {
             <img src={logo} alt="Ruix Logo" className="w-28 h-auto" />
           </div>
           <div className="mt-24 w-4/5 lg:w-3/4 text-center">
-            <h2 className="text-3xl font-bold mb-2">SIGN UP</h2>
-            <p className="text-gray-600 mb-12">
+            <h2 className="text-5xl font-normal mb-2 Babas">SIGN UP</h2>
+            <p className="text-gray-600 mb-12 Urbanist">
               Create an account to get started.
             </p>
             <button className="flex items-center justify-center w-full py-2 mb-6 border border-gray-300 rounded-md hover:bg-gray-100">
               <img className="w-5 h-5 mr-2" src={google} alt="Google Logo" />
-              Continue With Google
+              <p className="font-cabin text-xs font-extralight">
+                Continue With Google
+              </p>
             </button>
 
             <div className="flex items-center justify-center w-full mb-6">
@@ -28,26 +37,29 @@ const App = () => {
             </div>
             <form className="w-full flex flex-col mb-4">
               <input
-                className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="text"
-                placeholder="Name"
+                placeholder="Name "
                 required
               />
               <input
-                className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="email"
                 placeholder="Email"
                 required
               />
               <input
-                className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="password"
                 placeholder="Password"
                 required
               />
               <div className="flex items-center mb-4">
                 <input className="mr-2" type="checkbox" id="remember-me" />
-                <label className="text-gray-600 text-sm" htmlFor="remember-me">
+                <label
+                  className="text-gray-600 text-sm font-cabin"
+                  htmlFor="remember-me"
+                >
                   Remember Me
                 </label>
               </div>
@@ -55,9 +67,12 @@ const App = () => {
                 <p className="text-sm m-0">Register</p>
               </button>
             </form>
-            <p className="text-gray-600 mb-12">
+            <p className="text-gray-600 mb-12 Urbanist">
               Already have an account?{" "}
-              <a className="text-yellow-500 hover:underline" href="#">
+              <a
+                className="text-yellow-500 hover:underline Urbanist font-bold"
+                href="{}"
+              >
                 Log in
               </a>
             </p>
