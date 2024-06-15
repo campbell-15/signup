@@ -19,7 +19,7 @@ const App = () => {
             <img src={logo} alt="Ruix Logo" className="w-28 h-auto" />
           </div>
           <div className="mt-24 w-4/5 lg:w-3/4 text-center">
-            <h2 className="text-5xl font-normal mb-2 Babas">SIGN UP</h2>
+            <h2 className="text-5xl font-normal mb-2 Bebas">SIGN UP</h2>
             <p className="text-gray-600 mb-12 Urbanist">
               Create an account to get started.
             </p>
@@ -39,20 +39,23 @@ const App = () => {
               <input
                 className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="text"
-                placeholder="Name "
+                placeholder="Name"
                 required
+                aria-label="Name"
               />
               <input
                 className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="email"
                 placeholder="Email"
                 required
+                aria-label="Email"
               />
               <input
                 className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="password"
                 placeholder="Password"
                 required
+                aria-label="Password"
               />
               <div className="flex items-center mb-4">
                 <input className="mr-2" type="checkbox" id="remember-me" />
@@ -83,7 +86,7 @@ const App = () => {
             <img
               className="w-full h-full object-cover rounded-lg lg:rounded-none"
               src={background}
-              alt="Artistic"
+              alt="Artistic Background"
             />
           </div>
         </div>
