@@ -6,13 +6,13 @@ const App = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-200">
       <div className="flex flex-col lg:flex-row w-full lg:w-3/4 max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="flex flex-col items-center justify-center w-full lg:w-1/2 p-8 bg-white relative">
+        <div className="flex flex-col items-center justify-center w-full lg:w-1/2 p-8 bg-white relative rounded-lg lg:rounded-none">
           <div className="absolute top-8 left-8">
-            <img src={logo} alt="Ruix Logo" className="w-40 h-auto" />
+            <img src={logo} alt="Ruix Logo" className="w-24 h-auto" />
           </div>
           <div className="mt-24 w-4/5 lg:w-3/4 text-center">
             <h2 className="text-3xl font-bold mb-2">SIGN UP</h2>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-12">
               Create an account to get started.
             </p>
             <button className="flex items-center justify-center w-full py-2 mb-4 border border-gray-300 rounded-lg hover:bg-gray-100">
@@ -65,8 +65,14 @@ const App = () => {
             </p>
           </div>
         </div>
-        <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center bg-gray-200">
-          <img className="w-full h-auto object-cover" src={background} alt="Artistic" />
+        <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center bg-gray-200 rounded-lg lg:rounded-none">
+          <div className="w-full h-full">
+            <img
+              className="w-full h-full object-cover rounded-lg lg:rounded-none"
+              src={background}
+              alt="Artistic"
+            />
+          </div>
         </div>
       </div>
     </div>
