@@ -1,4 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setName,
+  setEmail,
+  setPassword,
+  setRememberMe,
+  resetForm,
+} from "./features/signupSlice";
 import logo from "./assets/Logo.png";
 import google from "./assets/google.png";
 import background from "./assets/Image.png";
@@ -11,6 +19,35 @@ WebFont.load({
 });
 
 const App = () => {
+  const dispatch = useDispatch();
+  const { name, email, password, rememberMe } = useSelector(
+    (state) => state.signup
+  );
+  const [passwordStrength, setPasswordStrength] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Implement your form submission logic here
+    // Example: dispatch(registerUser({ name, email, password, rememberMe }));
+    dispatch(resetForm());
+  };
+
+  const evaluatePasswordStrength = (password) => {
+    if (password.length < 6) {
+      return "Weak";
+    } else if (password.length >= 6 && password.length < 12) {
+      return "Moderate";
+    } else {
+      return "Strong";
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    dispatch(setPassword(newPassword));
+    setPasswordStrength(evaluatePasswordStrength(newPassword));
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-200">
       <div className="flex flex-col lg:flex-row w-full lg:w-5/6 max-w-5xl bg-white shadow-lg rounded-[40px] overflow-hidden">
@@ -29,17 +66,18 @@ const App = () => {
                 Continue With Google
               </p>
             </button>
-
             <div className="flex items-center justify-center w-full mb-6">
               <hr className="w-1/4 sm:w-1/5 border-t border-gray-300 my-0 mr-2" />
               <span className="px-2 text-gray-400 text-sm">Or</span>
               <hr className="w-1/4 sm:w-1/5 border-t border-gray-300 my-0 ml-2" />
             </div>
-            <form className="w-full flex flex-col mb-4">
+            <form className="w-full flex flex-col mb-4" onSubmit={handleSubmit}>
               <input
                 className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="text"
                 placeholder="Name"
+                value={name}
+                onChange={(e) => dispatch(setName(e.target.value))}
                 required
                 aria-label="Name"
               />
@@ -47,6 +85,8 @@ const App = () => {
                 className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="email"
                 placeholder="Email"
+                value={email}
+                onChange={(e) => dispatch(setEmail(e.target.value))}
                 required
                 aria-label="Email"
               />
@@ -54,11 +94,22 @@ const App = () => {
                 className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="password"
                 placeholder="Password"
+                value={password}
+                onChange={handlePasswordChange}
                 required
                 aria-label="Password"
               />
+              <p className="text-xs text-gray-600 font-cabin mb-3">
+                Password strength: {passwordStrength}
+              </p>
               <div className="flex items-center mb-4">
-                <input className="mr-2" type="checkbox" id="remember-me" />
+                <input
+                  className="mr-2"
+                  type="checkbox"
+                  id="remember-me"
+                  checked={rememberMe}
+                  onChange={(e) => dispatch(setRememberMe(e.target.checked))}
+                />
                 <label
                   className="text-gray-600 text-sm font-cabin"
                   htmlFor="remember-me"
@@ -66,7 +117,10 @@ const App = () => {
                   Remember Me
                 </label>
               </div>
-              <button className="w-full py-2 bg-black text-white rounded-full hover:bg-gray-800">
+              <button
+                className="w-full py-2 bg-black text-white rounded-full hover:bg-gray-800"
+                type="submit"
+              >
                 <p className="text-sm m-0">Register</p>
               </button>
             </form>
@@ -74,7 +128,7 @@ const App = () => {
               Already have an account?{" "}
               <a
                 className="text-yellow-500 hover:underline Urbanist font-bold"
-                href="{}"
+                href="#"
               >
                 Log in
               </a>
