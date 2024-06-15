@@ -20,14 +20,13 @@ WebFont.load({
 
 const App = () => {
   const dispatch = useDispatch();
-  const { name, email, password, rememberMe } = useSelector(
-    (state) => state.signup
-  );
+  const { name, email, password, rememberMe } = useSelector((state) => state.signup);
   const [passwordStrength, setPasswordStrength] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const strength = evaluatePasswordStrength(password);
@@ -39,8 +38,25 @@ const App = () => {
     }
 
     // Implement your form submission logic here
-    // Example: dispatch(registerUser({ name, email, password, rememberMe }));
-    dispatch(resetForm());
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, email, password, rememberMe }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setFeedbackMessage("Registration successful!");
+        dispatch(resetForm());
+      } else {
+        setFeedbackMessage(data.message || "Registration failed!");
+      }
+    } catch (error) {
+      setFeedbackMessage("An error occurred during registration.");
+    }
   };
 
   const evaluatePasswordStrength = (password) => {
@@ -54,13 +70,7 @@ const App = () => {
   };
 
   const checkPasswordUniqueness = (password) => {
-    const commonPasswords = [
-      "123456",
-      "password",
-      "123456789",
-      "12345678",
-      "12345",
-    ];
+    const commonPasswords = ["123456", "password", "123456789", "12345678", "12345"];
     return !commonPasswords.includes(password);
   };
 
@@ -81,14 +91,10 @@ const App = () => {
           </div>
           <div className="mt-24 w-4/5 lg:w-3/4 text-center">
             <h2 className="text-5xl font-normal mb-2 Bebas">SIGN UP</h2>
-            <p className="text-gray-600 mb-12 Urbanist">
-              Create an account to get started.
-            </p>
+            <p className="text-gray-600 mb-12 Urbanist">Create an account to get started.</p>
             <button className="flex items-center justify-center w-full py-2 mb-6 border border-gray-300 rounded-md hover:bg-gray-100">
               <img className="w-5 h-5 mr-2" src={google} alt="Google Logo" />
-              <p className="font-cabin text-xs font-extralight">
-                Continue With Google
-              </p>
+              <p className="font-cabin text-xs font-extralight">Continue With Google</p>
             </button>
             <div className="flex items-center justify-center w-full mb-6">
               <hr className="w-1/4 sm:w-1/5 border-t border-gray-300 my-0 mr-2" />
@@ -140,26 +146,18 @@ const App = () => {
                   checked={rememberMe}
                   onChange={(e) => dispatch(setRememberMe(e.target.checked))}
                 />
-                <label
-                  className="text-gray-600 text-sm font-cabin"
-                  htmlFor="remember-me"
-                >
-                  Remember Me
-                </label>
+                <label className="text-gray-600 text-sm font-cabin" htmlFor="remember-me">Remember Me</label>
               </div>
-              <button
-                className="w-full py-2 bg-black text-white rounded-full hover:bg-gray-800"
-                type="submit"
-              >
+              <button className="w-full py-2 bg-black text-white rounded-full hover:bg-gray-800" type="submit">
                 <p className="text-sm m-0">Register</p>
               </button>
             </form>
+            <p className="text-xs text-gray-600 font-cabin mb-4">
+              {feedbackMessage}
+            </p>
             <p className="text-gray-600 mb-12 Urbanist">
               Already have an account?{" "}
-              <a
-                className="text-yellow-500 hover:underline Urbanist font-bold"
-                href="{}"
-              >
+              <a className="text-yellow-500 hover:underline Urbanist font-bold" href="#">
                 Log in
               </a>
             </p>
@@ -167,11 +165,7 @@ const App = () => {
         </div>
         <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center bg-gray-200 rounded-lg lg:rounded-none">
           <div className="w-full h-full">
-            <img
-              className="w-full h-full object-cover rounded-lg lg:rounded-none"
-              src={background}
-              alt="Artistic Background"
-            />
+            <img className="w-full h-full object-cover rounded-lg lg:rounded-none" src={background} alt="Artistic Background" />
           </div>
         </div>
       </div>
