@@ -1,12 +1,16 @@
 import React from "react";
+import logo from "./assets/Logo.png";
+import background from "./assets/Image.png";
 
 const App = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-200">
-      <div className="flex w-11/12 lg:w-3/4 h-5/6 bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8">
-          <div className="text-4xl font-bold text-yellow-500 mb-4">Ruix</div>
-          <h1 className="text-2xl font-bold mb-2">SIGN UP</h1>
+      <div className="flex w-11/12 lg:w-3/4 h-auto lg:h-5/6 bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-8 bg-white rounded-lg lg:rounded-none">
+          <div className="w-full flex items-center justify-start mb-8">
+            <img src={logo} alt="Ruix Logo" className="w-166 h-51 mr-2" />
+          </div>
+          <h2 className="text-2xl font-bold mb-2">SIGN UP</h2>
           <p className="text-gray-600 mb-4">
             Create an account to get started.
           </p>
@@ -60,11 +64,7 @@ const App = () => {
           </p>
         </div>
         <div className="hidden lg:flex w-1/2 items-center justify-center bg-gray-200">
-          <img
-            className="w-3/4 rounded-lg"
-            src="#g"
-            alt="Artistic Image"
-          />
+          <img className="w-3/4 rounded-lg" src={background} alt="Artistic" />
         </div>
       </div>
     </div>
