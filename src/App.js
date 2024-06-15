@@ -24,9 +24,20 @@ const App = () => {
     (state) => state.signup
   );
   const [passwordStrength, setPasswordStrength] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const strength = evaluatePasswordStrength(password);
+    const isUnique = checkPasswordUniqueness(password);
+
+    if (strength === "Weak" || !isUnique) {
+      setPasswordError("Please choose a stronger and unique password.");
+      return;
+    }
+
     // Implement your form submission logic here
     // Example: dispatch(registerUser({ name, email, password, rememberMe }));
     dispatch(resetForm());
@@ -42,10 +53,23 @@ const App = () => {
     }
   };
 
+  const checkPasswordUniqueness = (password) => {
+    const commonPasswords = [
+      "123456",
+      "password",
+      "123456789",
+      "12345678",
+      "12345",
+    ];
+    return !commonPasswords.includes(password);
+  };
+
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
     dispatch(setPassword(newPassword));
-    setPasswordStrength(evaluatePasswordStrength(newPassword));
+    const strength = evaluatePasswordStrength(newPassword);
+    setPasswordStrength(strength);
+    setPasswordError(""); // Reset password error message when password changes
   };
 
   return (
@@ -96,11 +120,17 @@ const App = () => {
                 placeholder="Password"
                 value={password}
                 onChange={handlePasswordChange}
+                onFocus={() => setIsPasswordFocused(true)}
+                onBlur={() => setIsPasswordFocused(false)}
                 required
                 aria-label="Password"
               />
               <p className="text-xs text-gray-600 font-cabin mb-3">
-                Password strength: {passwordStrength}
+                {passwordError ? (
+                  <span className="text-red-600">{passwordError}</span>
+                ) : isPasswordFocused ? (
+                  `Password strength: ${passwordStrength}`
+                ) : null}
               </p>
               <div className="flex items-center mb-4">
                 <input
@@ -128,7 +158,7 @@ const App = () => {
               Already have an account?{" "}
               <a
                 className="text-yellow-500 hover:underline Urbanist font-bold"
-                href="#"
+                href="{}"
               >
                 Log in
               </a>
