@@ -6,11 +6,15 @@ import {
   setPassword,
   setRememberMe,
   resetForm,
+  setFeedbackMessage,
+  registerUser,
+  googleLogin,
 } from "./features/signupSlice";
 import logo from "./assets/Logo.png";
 import google from "./assets/google.png";
 import background from "./assets/Image.png";
 import WebFont from "webfontloader";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
 WebFont.load({
   google: {
@@ -20,13 +24,14 @@ WebFont.load({
 
 const App = () => {
   const dispatch = useDispatch();
-  const { name, email, password, rememberMe } = useSelector((state) => state.signup);
+  const { name, email, password, rememberMe, feedbackMessage } = useSelector(
+    (state) => state.signup
+  );
   const [passwordStrength, setPasswordStrength] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-  const [feedbackMessage, setFeedbackMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     const strength = evaluatePasswordStrength(password);
@@ -37,26 +42,11 @@ const App = () => {
       return;
     }
 
-    // Implement your form submission logic here
-    try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password, rememberMe }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setFeedbackMessage("Registration successful!");
+    dispatch(registerUser({ name, email, password, rememberMe }))
+      .unwrap()
+      .then(() => {
         dispatch(resetForm());
-      } else {
-        setFeedbackMessage(data.message || "Registration failed!");
-      }
-    } catch (error) {
-      setFeedbackMessage("An error occurred during registration.");
-    }
+      });
   };
 
   const evaluatePasswordStrength = (password) => {
@@ -70,7 +60,13 @@ const App = () => {
   };
 
   const checkPasswordUniqueness = (password) => {
-    const commonPasswords = ["123456", "password", "123456789", "12345678", "12345"];
+    const commonPasswords = [
+      "123456",
+      "password",
+      "123456789",
+      "12345678",
+      "12345",
+    ];
     return !commonPasswords.includes(password);
   };
 
@@ -79,97 +75,151 @@ const App = () => {
     dispatch(setPassword(newPassword));
     const strength = evaluatePasswordStrength(newPassword);
     setPasswordStrength(strength);
-    setPasswordError(""); // Reset password error message when password changes
+    setPasswordError("");
+  };
+
+  const handleGoogleSuccess = (response) => {
+    dispatch(googleLogin(response.credential))
+      .unwrap()
+      .then(() => {
+        dispatch(setFeedbackMessage("Google login successful!"));
+      })
+      .catch(() => {
+        dispatch(setFeedbackMessage("Google login failed!"));
+      });
+  };
+
+  const handleGoogleFailure = () => {
+    dispatch(setFeedbackMessage("Google login was unsuccessful."));
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-200">
-      <div className="flex flex-col lg:flex-row w-full lg:w-5/6 max-w-5xl bg-white shadow-lg rounded-[40px] overflow-hidden">
-        <div className="flex flex-col items-center justify-center w-full lg:w-1/2 p-8 bg-white relative">
-          <div className="absolute top-8 left-8">
-            <img src={logo} alt="Ruix Logo" className="w-28 h-auto" />
-          </div>
-          <div className="mt-24 w-4/5 lg:w-3/4 text-center">
-            <h2 className="text-5xl font-normal mb-2 Bebas">SIGN UP</h2>
-            <p className="text-gray-600 mb-12 Urbanist">Create an account to get started.</p>
-            <button className="flex items-center justify-center w-full py-2 mb-6 border border-gray-300 rounded-md hover:bg-gray-100">
-              <img className="w-5 h-5 mr-2" src={google} alt="Google Logo" />
-              <p className="font-cabin text-xs font-extralight">Continue With Google</p>
-            </button>
-            <div className="flex items-center justify-center w-full mb-6">
-              <hr className="w-1/4 sm:w-1/5 border-t border-gray-300 my-0 mr-2" />
-              <span className="px-2 text-gray-400 text-sm">Or</span>
-              <hr className="w-1/4 sm:w-1/5 border-t border-gray-300 my-0 ml-2" />
+    <GoogleOAuthProvider clientId="66114075710-bl34hvbchkodkb38bdiol32g4npc658v.apps.googleusercontent.com">
+      <div className="flex min-h-screen items-center justify-center bg-gray-200">
+        <div className="flex flex-col lg:flex-row w-full lg:w-5/6 max-w-5xl bg-white shadow-lg rounded-[40px] overflow-hidden">
+          <div className="flex flex-col items-center justify-center w-full lg:w-1/2 p-8 bg-white relative">
+            <div className="absolute top-8 left-8">
+              <img src={logo} alt="Ruix Logo" className="w-28 h-auto" />
             </div>
-            <form className="w-full flex flex-col mb-4" onSubmit={handleSubmit}>
-              <input
-                className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => dispatch(setName(e.target.value))}
-                required
-                aria-label="Name"
-              />
-              <input
-                className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => dispatch(setEmail(e.target.value))}
-                required
-                aria-label="Email"
-              />
-              <input
-                className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={handlePasswordChange}
-                onFocus={() => setIsPasswordFocused(true)}
-                onBlur={() => setIsPasswordFocused(false)}
-                required
-                aria-label="Password"
-              />
-              <p className="text-xs text-gray-600 font-cabin mb-3">
-                {passwordError ? (
-                  <span className="text-red-600">{passwordError}</span>
-                ) : isPasswordFocused ? (
-                  `Password strength: ${passwordStrength}`
-                ) : null}
+            <div className="mt-24 w-4/5 lg:w-3/4 text-center">
+              <h2 className="text-5xl font-normal mb-2 Bebas">SIGN UP</h2>
+              <p className="text-gray-600 mb-12 Urbanist">
+                Create an account to get started.
               </p>
-              <div className="flex items-center mb-4">
-                <input
-                  className="mr-2"
-                  type="checkbox"
-                  id="remember-me"
-                  checked={rememberMe}
-                  onChange={(e) => dispatch(setRememberMe(e.target.checked))}
-                />
-                <label className="text-gray-600 text-sm font-cabin" htmlFor="remember-me">Remember Me</label>
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onFailure={handleGoogleFailure}
+                buttonText="Continue with Google"
+                render={(renderProps) => (
+                  <button
+                    className="flex items-center justify-center w-full py-2 mb-6 border border-gray-300 rounded-md hover:bg-gray-100"
+                    onClick={renderProps.onClick}
+                    disabled={renderProps.disabled}
+                  >
+                    <img
+                      className="w-5 h-5 mr-2"
+                      src={google}
+                      alt="Google Logo"
+                    />
+                    <p className="font-cabin text-xs font-extralight">
+                      Continue With Google
+                    </p>
+                  </button>
+                )}
+              />
+              <div className="flex items-center justify-center w-full mb-6">
+                <hr className="w-1/4 sm:w-1/5 border-t border-gray-300 my-0 mr-2" />
+                <span className="px-2 text-gray-400 text-sm">Or</span>
+                <hr className="w-1/4 sm:w-1/5 border-t border-gray-300 my-0 ml-2" />
               </div>
-              <button className="w-full py-2 bg-black text-white rounded-full hover:bg-gray-800" type="submit">
-                <p className="text-sm m-0">Register</p>
-              </button>
-            </form>
-            <p className="text-xs text-gray-600 font-cabin mb-4">
-              {feedbackMessage}
-            </p>
-            <p className="text-gray-600 mb-12 Urbanist">
-              Already have an account?{" "}
-              <a className="text-yellow-500 hover:underline Urbanist font-bold" href="#">
-                Log in
-              </a>
-            </p>
+              <form
+                className="w-full flex flex-col mb-4"
+                onSubmit={handleSubmit}
+              >
+                <input
+                  className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
+                  type="text"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => dispatch(setName(e.target.value))}
+                  required
+                  aria-label="Name"
+                />
+                <input
+                  className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
+                  type="email"
+                  placeholder="Email"
+                  value={email}
+                  onChange={(e) => dispatch(setEmail(e.target.value))}
+                  required
+                  aria-label="Email"
+                />
+                <input
+                  className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
+                  required
+                  aria-label="Password"
+                />
+                <p className="text-xs text-gray-600 font-cabin mb-3">
+                  {passwordError ? (
+                    <span className="text-red-600">{passwordError}</span>
+                  ) : isPasswordFocused ? (
+                    `Password strength: ${passwordStrength}`
+                  ) : null}
+                </p>
+                <div className="flex items-center mb-4">
+                  <input
+                    className="mr-2"
+                    type="checkbox"
+                    id="remember-me"
+                    checked={rememberMe}
+                    onChange={(e) => dispatch(setRememberMe(e.target.checked))}
+                  />
+                  <label
+                    className="text-gray-600 text-sm font-cabin"
+                    htmlFor="remember-me"
+                  >
+                    Remember Me
+                  </label>
+                </div>
+                <button
+                  className="w-full py-2 bg-black text-white rounded-full hover:bg-gray-800"
+                  type="submit"
+                >
+                  <p className="text-sm m-0">Register</p>
+                </button>
+              </form>
+              <p className="text-xs text-gray-600 font-cabin mb-4">
+                {feedbackMessage}
+              </p>
+              <p className="text-gray-600 mb-12 Urbanist">
+                Already have an account?{" "}
+                <a
+                  className="text-yellow-500 hover:underline Urbanist font-bold"
+                  href="{}"
+                >
+                  Log in
+                </a>
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center bg-gray-200 rounded-lg lg:rounded-none">
-          <div className="w-full h-full">
-            <img className="w-full h-full object-cover rounded-lg lg:rounded-none" src={background} alt="Artistic Background" />
+          <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center bg-gray-200 rounded-lg lg:rounded-none">
+            <div className="w-full h-full">
+              <img
+                className="w-full h-full object-cover rounded-lg lg:rounded-none"
+                src={background}
+                alt="Artistic Background"
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </GoogleOAuthProvider>
   );
 };
 
