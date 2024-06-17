@@ -17,9 +17,10 @@ export const registerUser = createAsyncThunk(
         "http://localhost:5000/api/register",
         userData
       );
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem("token", response.data.token);
       return response.data;
     } catch (error) {
+      console.error("Registration error:", error.response || error.message);
       return rejectWithValue(
         error.response?.data || { message: "Registration failed!" }
       );
@@ -31,10 +32,14 @@ export const googleLogin = createAsyncThunk(
   "signup/googleLogin",
   async (token, { rejectWithValue }) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/google-login", { token });
-      localStorage.setItem('token', response.data.token); 
+      const response = await axios.post(
+        "http://localhost:5000/api/google-login",
+        { token }
+      );
+      localStorage.setItem("token", response.data.token);
       return response.data;
     } catch (error) {
+      console.error("Google login error:", error.response || error.message);
       return rejectWithValue(
         error.response?.data || { message: "Google login failed!" }
       );
@@ -73,7 +78,7 @@ const signupSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(registerUser.fulfilled, (state, action) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.feedbackMessage = "Registration successful!";
         state.name = "";
         state.email = "";
@@ -84,7 +89,7 @@ const signupSlice = createSlice({
         state.feedbackMessage =
           action.payload?.message || "Registration failed!";
       })
-      .addCase(googleLogin.fulfilled, (state, action) => {
+      .addCase(googleLogin.fulfilled, (state) => {
         state.feedbackMessage = "Google login successful!";
       })
       .addCase(googleLogin.rejected, (state, action) => {

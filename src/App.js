@@ -33,33 +33,24 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const strength = evaluatePasswordStrength(password);
     const isUnique = checkPasswordUniqueness(password);
-
     if (strength === "Weak" || !isUnique) {
       setPasswordError("Please choose a stronger and unique password.");
       return;
     }
-
     dispatch(registerUser({ name, email, password, rememberMe }))
       .unwrap()
-      .then(() => {
-        dispatch(resetForm());
-      })
-      .catch((error) => {
-        dispatch(setFeedbackMessage(error.message || "Registration failed!"));
-      });
+      .then(() => dispatch(resetForm()))
+      .catch((error) =>
+        dispatch(setFeedbackMessage(error.message || "Registration failed!"))
+      );
   };
 
   const evaluatePasswordStrength = (password) => {
-    if (password.length < 6) {
-      return "Weak";
-    } else if (password.length >= 6 && password.length < 12) {
-      return "Moderate";
-    } else {
-      return "Strong";
-    }
+    if (password.length < 6) return "Weak";
+    else if (password.length >= 6 && password.length < 12) return "Moderate";
+    else return "Strong";
   };
 
   const checkPasswordUniqueness = (password) => {
@@ -82,15 +73,22 @@ const App = () => {
   };
 
   const login = useGoogleLogin({
-    onSuccess: (codeResponse) => {
-      dispatch(googleLogin({ token: codeResponse.code }))
+    onSuccess: (tokenResponse) => {
+      const token = tokenResponse.token;
+      console.log("Google login successful, token:", token);
+
+      dispatch(googleLogin({ token }))
         .unwrap()
         .then(() => {
           dispatch(setFeedbackMessage("Google login successful!"));
         })
         .catch((error) => {
+          console.error("Google login error:", error);
           dispatch(setFeedbackMessage(error.message || "Google login failed!"));
         });
+    },
+    onError: (error) => {
+      console.error("Google login failed:", error);
     },
     flow: "auth-code",
   });
@@ -100,7 +98,7 @@ const App = () => {
       <div className="flex flex-col lg:flex-row w-full lg:w-5/6 max-w-5xl bg-white shadow-lg rounded-[40px] overflow-hidden">
         <div className="flex flex-col items-center justify-center w-full lg:w-1/2 p-8 bg-white relative">
           <div className="absolute top-8 left-8">
-            <img src={logo} alt="Ruix Logo" className="w-28 h-auto" />
+            <img src={logo} alt="Logo" className="w-28 h-auto" />
           </div>
           <div className="mt-24 w-4/5 lg:w-3/4 text-center">
             <h2 className="text-5xl font-normal mb-2 Bebas">SIGN UP</h2>
@@ -109,7 +107,7 @@ const App = () => {
             </p>
             <button
               className="flex items-center justify-center w-full py-2 mb-6 border border-gray-300 rounded-md hover:bg-gray-100"
-              onClick={() => login()}
+              onClick={login}
             >
               <img className="w-5 h-5 mr-2" src={google} alt="Google Logo" />
               <p className="font-cabin text-xs font-extralight">
@@ -191,7 +189,6 @@ const App = () => {
                 <p className="text-sm m-0">Register</p>
               </button>
             </form>
-
             <p className="text-xs text-gray-600 font-cabin mb-4">
               {feedbackMessage}
             </p>
@@ -211,7 +208,7 @@ const App = () => {
             <img
               className="w-full h-full object-cover rounded-lg lg:rounded-none"
               src={background}
-              alt="Artistic Background"
+              alt="Background"
             />
           </div>
         </div>
