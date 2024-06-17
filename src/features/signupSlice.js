@@ -72,13 +72,15 @@ const signupSlice = createSlice({
         state.rememberMe = false;
       })
       .addCase(registerUser.rejected, (state, action) => {
-        state.feedbackMessage = action.payload.message || "Registration failed!";
+        state.feedbackMessage =
+          action.payload.message || "Registration failed!";
       })
       .addCase(googleLogin.fulfilled, (state, action) => {
         state.feedbackMessage = "Google login successful!";
       })
       .addCase(googleLogin.rejected, (state, action) => {
-        state.feedbackMessage = action.payload.message || "Google login failed!";
+        state.feedbackMessage =
+          action.payload.message || "Google login failed!";
       });
   },
 });
