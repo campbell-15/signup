@@ -123,6 +123,9 @@ const App = () => {
             </div>
             <form className="w-full flex flex-col mb-4" onSubmit={handleSubmit}>
               <input
+                id="name"
+                name="name"
+                autoComplete="name"
                 className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="text"
                 placeholder="Name"
@@ -132,6 +135,9 @@ const App = () => {
                 aria-label="Name"
               />
               <input
+                id="email"
+                name="email"
+                autoComplete="email"
                 className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="email"
                 placeholder="Email"
@@ -141,6 +147,9 @@ const App = () => {
                 aria-label="Email"
               />
               <input
+                id="password"
+                name="password"
+                autoComplete="new-password"
                 className="px-4 py-2 mb-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 font-cabin"
                 type="password"
                 placeholder="Password"
@@ -160,9 +169,11 @@ const App = () => {
               </p>
               <div className="flex items-center mb-4">
                 <input
+                  id="remember-me"
+                  name="remember-me"
+                  autoComplete="off"
                   className="mr-2"
                   type="checkbox"
-                  id="remember-me"
                   checked={rememberMe}
                   onChange={(e) => dispatch(setRememberMe(e.target.checked))}
                 />
@@ -180,6 +191,7 @@ const App = () => {
                 <p className="text-sm m-0">Register</p>
               </button>
             </form>
+
             <p className="text-xs text-gray-600 font-cabin mb-4">
               {feedbackMessage}
             </p>
