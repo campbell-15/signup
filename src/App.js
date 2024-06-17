@@ -46,6 +46,9 @@ const App = () => {
       .unwrap()
       .then(() => {
         dispatch(resetForm());
+      })
+      .catch((error) => {
+        dispatch(setFeedbackMessage(error.message || "Registration failed!"));
       });
   };
 
@@ -85,8 +88,8 @@ const App = () => {
         .then(() => {
           dispatch(setFeedbackMessage("Google login successful!"));
         })
-        .catch(() => {
-          dispatch(setFeedbackMessage("Google login failed!"));
+        .catch((error) => {
+          dispatch(setFeedbackMessage(error.message || "Google login failed!"));
         });
     },
     flow: "auth-code",
