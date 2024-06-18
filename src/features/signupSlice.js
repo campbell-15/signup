@@ -14,7 +14,7 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/register",
+        "http://localhost:5001/api/register",
         userData
       );
       localStorage.setItem('token', response.data.token);
@@ -31,7 +31,7 @@ export const googleLogin = createAsyncThunk(
   "signup/googleLogin",
   async (token, { rejectWithValue }) => {
     try {
-      const response = await axios.post("http://localhost:5000/api/google-login", { token });
+      const response = await axios.post("http://localhost:5001/api/google-login", { token });
       localStorage.setItem('token', response.data.token); 
       return response.data;
     } catch (error) {
