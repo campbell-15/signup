@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react"; // Importing React and useState hook
+import { useDispatch, useSelector } from "react-redux"; // Importing useDispatch and useSelector hooks from react-redux
 import {
   setName,
   setEmail,
@@ -9,46 +9,50 @@ import {
   setFeedbackMessage,
   registerUser,
   googleLogin,
-} from "./features/signupSlice";
-import logo from "./assets/Logo.png";
-import google from "./assets/google.png";
-import background from "./assets/Image.png";
-import WebFont from "webfontloader";
-import { useGoogleLogin } from "@react-oauth/google";
+} from "./features/signupSlice"; // Importing Redux actions from signupSlice
+import logo from "./assets/Logo.png"; // Importing logo image
+import google from "./assets/google.png"; // Importing Google logo image
+import background from "./assets/Image.png"; // Importing background image
+import WebFont from "webfontloader"; // Importing WebFontLoader
+import { useGoogleLogin } from "@react-oauth/google"; // Importing useGoogleLogin hook from @react-oauth/google
 
 WebFont.load({
   google: {
-    families: ["Bebas Neue", "Urbanist", "Cabin"],
+    families: ["Bebas Neue", "Urbanist", "Cabin"], // Loading Google fonts
   },
 });
 
 const App = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // Initializing useDispatch hook
   const { name, email, password, rememberMe, feedbackMessage } = useSelector(
     (state) => state.signup
-  );
-  const [passwordStrength, setPasswordStrength] = useState("");
-  const [passwordError, setPasswordError] = useState("");
-  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  ); // Fetching state variables from Redux store
+  const [passwordStrength, setPasswordStrength] = useState(""); // Initializing password strength state
+  const [passwordError, setPasswordError] = useState(""); // Initializing password error state
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false); // Initializing password focus state
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    const strength = evaluatePasswordStrength(password);
-    const isUnique = checkPasswordUniqueness(password);
+    e.preventDefault(); // Preventing default form submission behavior
+    const strength = evaluatePasswordStrength(password); // Evaluating password strength
+    const isUnique = checkPasswordUniqueness(password); // Checking password uniqueness
     if (strength === "Weak" || !isUnique) {
+      // Validating password strength and uniqueness
       setPasswordError("Please choose a stronger and unique password.");
       return;
     }
+    // Dispatching registerUser action with user data
     dispatch(registerUser({ name, email, password, rememberMe }))
       .unwrap()
-      .then(() => dispatch(resetForm()))
-      .catch((error) =>
-        dispatch(setFeedbackMessage(error.message || "Registration failed!"))
+      .then(() => dispatch(resetForm())) // Resetting form on successful registration
+      .catch(
+        (error) =>
+          dispatch(setFeedbackMessage(error.message || "Registration failed!")) // Setting feedback message on registration failure
       );
   };
 
   const evaluatePasswordStrength = (password) => {
-    if (password.length < 6) return "Weak";
+    if (password.length < 6)
+      return "Weak"; // Evaluating password strength based on length
     else if (password.length >= 6 && password.length < 12) return "Moderate";
     else return "Strong";
   };
@@ -60,37 +64,54 @@ const App = () => {
       "123456789",
       "12345678",
       "12345",
-    ];
-    return !commonPasswords.includes(password);
+    ]; // Common passwords to check against
+    return !commonPasswords.includes(password); // Checking if password is unique
   };
 
   const handlePasswordChange = (e) => {
-    const newPassword = e.target.value;
-    dispatch(setPassword(newPassword));
-    const strength = evaluatePasswordStrength(newPassword);
-    setPasswordStrength(strength);
-    setPasswordError("");
+    const newPassword = e.target.value; // Getting new password from input
+    dispatch(setPassword(newPassword)); // Dispatching setPassword action
+    const strength = evaluatePasswordStrength(newPassword); // Evaluating new password strength
+    setPasswordStrength(strength); // Updating password strength state
+    setPasswordError(""); // Resetting password error
   };
 
+  // Handling Google login using useGoogleLogin hook
   const login = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      const token = tokenResponse.token;
-      console.log("Google login successful, token:", token);
+      console.log("Google login successful, tokenResponse:", tokenResponse); // Logging token response on successful Google login
 
-      dispatch(googleLogin({ token }))
+      const code = tokenResponse.code; // Getting authorization code from token response
+      console.log("Authorization code:", code); // Logging authorization code
+
+      if (!code) {
+        console.error(
+          "Authorization code is empty, unable to proceed with Google login."
+        ); // Logging error if authorization code is empty
+        dispatch(
+          setFeedbackMessage(
+            "Google login failed: Empty authorization code received."
+          )
+        ); // Setting feedback message on empty authorization code
+        return;
+      }
+
+      // Dispatching googleLogin action with authorization code
+      dispatch(googleLogin({ code }))
         .unwrap()
         .then(() => {
-          dispatch(setFeedbackMessage("Google login successful!"));
+          dispatch(setFeedbackMessage("Google login successful!")); // Setting feedback message on successful Google login
         })
         .catch((error) => {
-          console.error("Google login error:", error);
-          dispatch(setFeedbackMessage(error.message || "Google login failed!"));
+          console.error("Google login error:", error); // Logging Google login error
+          dispatch(setFeedbackMessage(error.message || "Google login failed!")); // Setting feedback message on Google login failure
         });
     },
     onError: (error) => {
-      console.error("Google login failed:", error);
+      console.error("Google login failed:", error); // Logging Google login failure
+      dispatch(setFeedbackMessage("Google login failed!")); // Setting feedback message on Google login failure
     },
-    flow: "auth-code",
+    flow: "auth-code", // Google OAuth2 flow type
   });
 
   return (
