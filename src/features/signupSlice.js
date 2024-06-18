@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import axiosInstance from './axiosInstance'; // Adjust the path as needed
 
 const initialState = {
   name: "",
@@ -13,10 +13,7 @@ export const registerUser = createAsyncThunk(
   "signup/registerUser",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5001/api/register",
-        userData
-      );
+      const response = await axiosInstance.post("/register", userData);
       localStorage.setItem('token', response.data.token);
       return response.data;
     } catch (error) {
@@ -31,7 +28,7 @@ export const googleLogin = createAsyncThunk(
   "signup/googleLogin",
   async (token, { rejectWithValue }) => {
     try {
-      const response = await axios.post("http://localhost:5001/api/google-login", { token });
+      const response = await axiosInstance.post("/google-login", { token });
       localStorage.setItem('token', response.data.token); 
       return response.data;
     } catch (error) {
@@ -103,4 +100,5 @@ export const {
   setFeedbackMessage,
   clearFeedbackMessage,
 } = signupSlice.actions;
+
 export default signupSlice.reducer;
